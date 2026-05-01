@@ -1,0 +1,25 @@
+services:
+  phonebook:
+    build:
+      context: .
+      args:
+        - NODE_ENV=production
+        - PORT=3000
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.phonebook.loadbalancer.server.port=3000"
+      - "traefik.http.routers.phonebook.entrypoints=web-secure"
+      - "traefik.http.routers.phonebook.rule=Host(`phonebook.prmckinney.com`)"
+      - "traefik.http.routers.phonebook.tls=true"
+      - "traefik.http.routers.phonebook.tls.certresolver=default"
+    healthcheck:
+      disable: true
+    networks:
+      - traefik_proxy
+networks:
+  traefik_proxy:
+    external: true
