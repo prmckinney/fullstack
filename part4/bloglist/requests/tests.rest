@@ -1,0 +1,12 @@
+GET http://localhost:3000/api/blogs
+
+###
+POST http://localhost:3000/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Test Blog",
+  "author": "Me",
+  "url": "https://here.com",
+  "likes": 12
+}
