@@ -30,7 +30,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PW}
       - MONGO_INITDB_DATABASE=phonebook-database
-    #volumes:
+    volumes:
+      - ./mongodata:/data/db
       # this is an example of how to seed data in mongo containers. The Docker Hub mongo README
       # explains that any data dropped into the docker-entrypoint-initdb.d directory will be injected 
       # into mongo at startup. This is also a common pattern for other db solutions like mysql or psql
