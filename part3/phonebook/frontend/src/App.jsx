@@ -45,11 +45,10 @@ const App = () => {
             setNewNumber('')
           })
           .catch(error => {
-            setError(`Note '${existingPerson.name}' was previously removed from server`)
+            setError(error.response.data.error)
             setTimeout(() => {
               setError(null)
             }, 5000)
-            setPersons(persons.filter(person => person.id !== existingPerson.id))
           })
 
       }
@@ -64,6 +63,12 @@ const App = () => {
           }, 5000)
           setNewName('')
           setNewNumber('')
+        })
+        .catch(error => {
+          setError(error.response.data.error)
+          setTimeout(() => {
+            setError(null)
+          }, 5000)
         })
     }
   }
