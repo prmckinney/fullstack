@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Notification from './components/Notification'
 import Error from './components/Error'
 import LoginForm from './components/LoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
 import Blog from './components/Blog'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -14,9 +15,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [error, setError] = useState(null)
   const [notification, setNotification] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -66,8 +65,7 @@ const App = () => {
     console.log('logged out')
   }
 
-  const handleCreateBlog = async event => {
-    event.preventDefault()
+  const createBlog = async ({ title, author, url }) => {
     const newBlogObject = {
       title,
       author,
@@ -77,39 +75,48 @@ const App = () => {
     try {
       const returnedBlog = await blogService.createNew(newBlogObject)
       setBlogs(blogs.concat(returnedBlog))
-      setNotification(`New blog "${newBlogObject.title}" by "${newBlogObject.author}" added`)
+      setNotification(`New blog "${title}" by "${author}" added`)
+      blogFormRef.current.toggleVisibility()
       setTimeout(() => {
         setNotification(null)
       }, 5000)
 
     }
     catch {
-      setError(`Unable to add "${newBlogObject.title}"`)
+      setError(`Unable to add "${title}"`)
       setTimeout(() => {
         setError(null)
       }, 5000)
-
     }
+  }
+
+  const updateBlog = (newBlog) => {
+    setBlogs(blogs.map(blog => blog.id === newBlog.id ? newBlog : blog))
+  }
+
+  const deleteBlog = (newBlogId) => {
+    setBlogs(blogs.filter(blog => blog.id !== newBlogId))
   }
 
   return (
     <div>
       <Error message={error} />
       <Notification message={notification} />
-
-      {!user && LoginForm(username, setUsername, password, setPassword, handleLogin)}
-      {user && (
-        <div>
+      <div>
+        {!user && LoginForm(username, setUsername, password, setPassword, handleLogin)}
+        {user &&
           <p>{user.name} logged in
             <button onClick={handleLogout}>Logout</button>
           </p>
-          <h2>Blogs</h2>
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
-          )}
-          {CreateBlogForm(title, setTitle, author, setAuthor, url, setUrl, handleCreateBlog)}
-        </div>
-      )}
+        }
+        <h2>Blogs</h2>
+        {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+          <Blog key={blog.id} blog={blog} user={user} updateBlog={updateBlog} deleteBlog={deleteBlog}/>
+        )}
+        <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+          {CreateBlogForm(createBlog)}
+        </Togglable>
+      </div>
     </div>
   )
 }
