@@ -31,7 +31,7 @@ describe('<Blog />', () => {
   })
 
   test('Renders details after clicking view', async () => {
-    render(<Blog blog={blog} user={blogUser}/>)
+    render(<Blog blog={blog} user={blogUser} />)
 
     const user = userEvent.setup()
     const button = screen.getByText('view')
@@ -51,9 +51,9 @@ describe('<Blog />', () => {
 
   test('Click like twice', async () => {
     const mockHandler = vi.fn()
-    const mockLikeHandler = vi.spyOn(blogService, 'incrementLikes').mockImplementation(() => {})
+    const mockLikeHandler = vi.spyOn(blogService, 'incrementLikes').mockReturnValue({ likes: 2 })
 
-    render(<Blog blog={blog} user={blogUser} updateBlog={mockHandler}/>)
+    render(<Blog blog={blog} user={blogUser} updateBlog={mockHandler} />)
 
     const user = userEvent.setup()
     const button = screen.getByText('view')
