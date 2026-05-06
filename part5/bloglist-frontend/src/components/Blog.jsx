@@ -32,6 +32,9 @@ const Blog = ({ blog, user, updateBlog, deleteBlog }) => {
     }
   }
 
+  console.log(`likes = ${blog.likes}`)
+  console.log(`blog user = ${blog.user}`)
+  console.log(`user = ${user}`)
   return (
     <div style={blogStyle}>
       <div style={hideWhenExpanded}>
@@ -39,10 +42,10 @@ const Blog = ({ blog, user, updateBlog, deleteBlog }) => {
         <button onClick={toggleExpanded}>view</button>
       </div>
       <div style={showWhenExpanded}>
-        <li>{blog.title} details <button onClick={toggleExpanded}>hide</button></li>
+        <li>{blog.title} {blog.author}<button onClick={toggleExpanded}>hide</button></li>
         <li>{blog.url}</li>
         <li>{likes} <button onClick={handleLike}>like</button></li>
-        <li>{blog.author}</li>
+        <li>{blog.user.name}</li>
         <button style={deleteVisibility} onClick={handleDelete}>delete</button>
       </div>
     </div>
