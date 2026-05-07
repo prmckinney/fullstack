@@ -25,14 +25,14 @@ describe('Blog app', () => {
   })
 
   test('Login form is shown', async ({ page }) => {
-    const locator = page.getByText('Log in to application')
+    const locator = page.getByText('login')
     await expect(locator).toBeVisible()
   })
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
       await login(page, 'test', 'password')
-      await expect(page.getByText('Blogs')).toBeVisible()
+      await expect(page.getByText('Test Account logged in')).toBeVisible()
 
     })
 
@@ -55,14 +55,12 @@ describe('Blog app', () => {
 
     test('like a blog', async ({ page }) => {
       // Expand Details
-      await page.getByText('test blog test author')
-        .getByRole('button', { name: 'view' }).click()
+      await page.getByRole('link', { name: 'test blog test author' }).click()
 
       // Click Like
-      await page.getByText('test blog test author').locator('..')
-        .getByRole('button', { name: 'like' }).click()
+      await page.getByRole('button', { name: 'like' }).click()
 
-      await expect(page.getByText('1')).toBeVisible()
+      await expect(page.getByText('likes 1')).toBeVisible()
     })
 
     test('delete a blog', async ({ page }) => {
@@ -74,12 +72,10 @@ describe('Blog app', () => {
       })
 
       // Expand Details
-      await page.getByText('test blog test author')
-        .getByRole('button', { name: 'view' }).click()
+      await page.getByRole('link', { name: 'test blog test author' }).click()
 
       // Click Delete
-      await page.getByText('test blog test author').locator('..')
-        .getByRole('button', { name: 'delete' }).click()
+      await page.getByRole('button', { name: 'remove' }).click()
 
       await expect(page.getByText('test blog test author').filter({ visible: true })).not.toBeVisible()
     })
@@ -91,11 +87,10 @@ describe('Blog app', () => {
       await login(page, 'test2', 'password2')
 
       // Expand Details
-      await page.getByText('test blog test author')
-        .getByRole('button', { name: 'view' }).click()
+      await page.getByRole('link', { name: 'test blog test author' }).click()
 
       // Ensure no delete button
-      await expect(page.getByRole('button', { name: 'delete' })).toBeHidden()
+      await expect(page.getByRole('button', { name: 'remove' })).toBeHidden()
     })
 
     test('blogs sorted by number of likes', async ({ page }) => {

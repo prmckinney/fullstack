@@ -4,6 +4,7 @@ import CreateBlogForm from './CreateBlogForm'
 
 describe('<CreateBlogForm />', () => {
   test('Creating a new blog entry', async () => {
+    vi.mock('react-router-dom', () => ({ useNavigate: vi.fn() }))
     const mockHandler = vi.fn()
 
     render(<CreateBlogForm createBlog={mockHandler} />)

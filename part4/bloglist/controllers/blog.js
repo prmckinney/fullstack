@@ -16,7 +16,7 @@ blogRouter.post('/', middleware.userExtractor, async (request, response) => {
   }
 
   const blog = new Blog({ ...request.body, user: user.id })
-  blog.populate('user')
+  await blog.populate('user')
   const savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
@@ -42,7 +42,7 @@ blogRouter.delete('/:id', middleware.userExtractor, async (request, response) =>
 
 blogRouter.put('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
-  blog.populate('user')
+  await blog.populate('user')
 
   blog.likes = request.body.likes
 

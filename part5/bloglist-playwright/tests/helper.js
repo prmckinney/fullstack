@@ -1,11 +1,12 @@
 const login = async (page, username, password) => {
+  await page.getByRole('link', { name: 'login' }).click()
   await page.getByLabel('username').fill(username)
   await page.getByLabel('password').fill(password)
   await page.getByRole('button', { name: 'login' }).click()
 }
 
 const createBlog = async (page, title, author, url) => {
-  await page.getByRole('button', { name: 'Create new blog' }).click()
+  await page.getByRole('link', { name: 'new blog' }).click()
   await page.getByLabel('title').fill(title)
   await page.getByLabel('author').fill(author)
   await page.getByLabel('url').fill(url)
@@ -15,19 +16,16 @@ const createBlog = async (page, title, author, url) => {
 
 const likeBlog = async (page, title, author) => {
   // Expand Details
-  await page.getByText(`${title} ${author}`)
-    .getByRole('button', { name: 'view' }).click()
+  await page.getByRole('link', { name: `${title} ${author}` }).click()
 
   // Click Like
-  await page.getByText(`${title} ${author}`).locator('..')
-    .getByRole('button', { name: 'like' }).click()
+  await page.getByRole('button', { name: 'like' }).click()
 
-  // Hide Details
-  await page.getByText(`${title} ${author}`)
-    .getByRole('button', { name: 'hide' }).click()
+  // Return to blog page
+  await page.getByRole('link', { name: 'blogs' }).click()
 
-  await page.getByText(`${title} ${author}`)
-    .getByRole('button', { name: 'view' }).waitFor()
+  // Wait for return to main page
+  await page.getByText('logged in').waitFor()
 }
 
 export { login, createBlog, likeBlog }

@@ -11,54 +11,58 @@ describe('<Blog />', () => {
     likes: 7,
     user: { id: 0 }
   }
-  const blogUser = {
+  const blogOwner = {
     id: 0
   }
+  const blogAltUser = {
+    id: 1
+  }
 
-  test('Renders default detail', () => {
-    render(<Blog blog={blog} user={blogUser} />)
-
-    const titleElements = screen.getAllByText('React patterns', { exact: false })
-    expect(titleElements[0]).toBeVisible()
-    expect(titleElements[1]).not.toBeVisible()
-
-    const authorElements = screen.getAllByText('Michael Chan', { exact: false })
-    expect(authorElements[0]).toBeVisible()
-    expect(authorElements[1]).not.toBeVisible()
-
-    expect(screen.getByText('https://reactpatterns.com/')).not.toBeVisible()
-    expect(screen.getByText('7')).not.toBeVisible()
+  beforeEach(() => {
+    vi.mock('react-router-dom', () => ({ useNavigate: vi.fn() }))
   })
 
-  test('Renders details after clicking view', async () => {
-    render(<Blog blog={blog} user={blogUser} />)
 
-    const user = userEvent.setup()
-    const button = screen.getByText('view')
-    await user.click(button)
+  test('Renders default details for unauthorized user', () => {
+    render(<Blog blog={blog} user={null} />)
 
-    const titleElements = screen.getAllByText('React patterns', { exact: false })
-    expect(titleElements[0]).not.toBeVisible()
-    expect(titleElements[1]).toBeVisible()
-
-    const authorElements = screen.getAllByText('Michael Chan', { exact: false })
-    expect(authorElements[0]).not.toBeVisible()
-    expect(authorElements[1]).toBeVisible()
-
+    expect(screen.getByText('React patterns', { exact: false })).toBeVisible()
+    expect(screen.getByText('Michael Chan', { exact: false })).toBeVisible()
     expect(screen.getByText('https://reactpatterns.com/')).toBeVisible()
-    expect(screen.getByText('7')).toBeVisible()
+    expect(screen.getByText('likes 7')).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'like' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'remove' })).toBeNull()
+  })
+
+  test('Renders default details for authorized user', () => {
+    render(<Blog blog={blog} user={blogAltUser} />)
+
+    expect(screen.getByText('React patterns', { exact: false })).toBeVisible()
+    expect(screen.getByText('Michael Chan', { exact: false })).toBeVisible()
+    expect(screen.getByText('https://reactpatterns.com/')).toBeVisible()
+    expect(screen.getByText('likes 7')).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'like' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'remove' })).toBeNull()
+  })
+
+  test('Renders default details for owner', () => {
+    render(<Blog blog={blog} user={blogOwner} />)
+
+    expect(screen.getByText('React patterns', { exact: false })).toBeVisible()
+    expect(screen.getByText('Michael Chan', { exact: false })).toBeVisible()
+    expect(screen.getByText('https://reactpatterns.com/')).toBeVisible()
+    expect(screen.getByText('likes 7')).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'like' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'remove' })).toBeVisible()
   })
 
   test('Click like twice', async () => {
     const mockHandler = vi.fn()
     const mockLikeHandler = vi.spyOn(blogService, 'incrementLikes').mockReturnValue({ likes: 2 })
 
-    render(<Blog blog={blog} user={blogUser} updateBlog={mockHandler} />)
+    render(<Blog blog={blog} user={blogAltUser} updateBlog={mockHandler} />)
 
     const user = userEvent.setup()
-    const button = screen.getByText('view')
-    await user.click(button)
-
     const likeButton = screen.getByText('like')
     await user.click(likeButton)
     await user.click(likeButton)
