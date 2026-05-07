@@ -1,3 +1,5 @@
+import { Alert } from '@mui/material'
+
 const Error = ({ message }) => {
   if (message === null) {
     return null

@@ -50,17 +50,17 @@ describe('Blog app', () => {
     })
 
     test('a new blog can be created', async ({ page }) => {
-      await expect(page.getByText('test blog test author').filter({ visible: true })).toBeVisible()
+      await expect(page.getByText('test blog by test author').filter({ visible: true })).toBeVisible()
     })
 
     test('like a blog', async ({ page }) => {
       // Expand Details
-      await page.getByRole('link', { name: 'test blog test author' }).click()
+      await page.getByRole('link', { name: 'test blog by test author' }).click()
 
       // Click Like
       await page.getByRole('button', { name: 'like' }).click()
 
-      await expect(page.getByText('likes 1')).toBeVisible()
+      await expect(page.getByText('1 likes')).toBeVisible()
     })
 
     test('delete a blog', async ({ page }) => {
@@ -72,12 +72,12 @@ describe('Blog app', () => {
       })
 
       // Expand Details
-      await page.getByRole('link', { name: 'test blog test author' }).click()
+      await page.getByRole('link', { name: 'test blog by test author' }).click()
 
       // Click Delete
       await page.getByRole('button', { name: 'remove' }).click()
 
-      await expect(page.getByText('test blog test author').filter({ visible: true })).not.toBeVisible()
+      await expect(page.getByText('test blog by test author').filter({ visible: true })).not.toBeVisible()
     })
 
     test('can\'t delete other\'s blog', async ({ page }) => {
@@ -87,7 +87,7 @@ describe('Blog app', () => {
       await login(page, 'test2', 'password2')
 
       // Expand Details
-      await page.getByRole('link', { name: 'test blog test author' }).click()
+      await page.getByRole('link', { name: 'test blog by test author' }).click()
 
       // Ensure no delete button
       await expect(page.getByRole('button', { name: 'remove' })).toBeHidden()

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import blogService from '../services/blogs'
+import { Button, Paper, Typography } from '@mui/material'
 
 const Blog = ({ blog, user, updateBlog, deleteBlog }) => {
   const [likes, setLikes] = useState('')
@@ -17,7 +18,6 @@ const Blog = ({ blog, user, updateBlog, deleteBlog }) => {
     setLikes(newBlog.likes)
   }
 
-  const deleteVisibility = { display: (user && blog.user.id === user.id) ? '' : 'none' }
   const handleDelete = async () => {
     if (window.confirm(`Remove ${blog.name} by ${blog.author}?`)) {
       await blogService.deleteId(blog.id)
@@ -26,17 +26,20 @@ const Blog = ({ blog, user, updateBlog, deleteBlog }) => {
     }
   }
 
-  console.log(`likes = ${blog.likes}`)
-  console.log(`blog user = ${blog.user}`)
-  console.log(`user = ${user}`)
+  //const likeStyle = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
+
   return (
-    <div>
-      <h1>{blog.author}: {blog.title}</h1>
-      <li><a href={blog.url}>{blog.url}</a></li>
-      <li>likes {likes} {(user) ? <button onClick={handleLike}>like</button> : null}</li>
-      <li>Added by {blog.user.name}</li>
-      <button style={deleteVisibility} onClick={handleDelete}>remove</button>
-    </div>
+    <Paper sx={{ mt: 4, p: 2 }}>
+      <Typography variant="h4">{blog.title}</Typography>
+      <Typography variant="h6" sx={{ color: 'rgba(0,0,0,0.6)' }}>by {blog.author}</Typography>
+      <Typography><a href={blog.url}>{blog.url}</a></Typography>
+      <Typography sx={{ color: 'rgba(0,0,0,0.5)' }}>Added by {blog.user.name}</Typography>
+      <Typography variant="h6">
+        {likes} likes
+        {(user) ? <Button onClick={handleLike} sx={{ border: 1, m: 1 }}>like</Button> : null}
+        {(user && blog.user.id === user.id) ? <Button onClick={handleDelete} sx={{ border: 1, m: 1, color: 'rgba(255,0,0,1)' }}>remove</Button> : null}
+      </Typography>
+    </Paper>
   )
 }
 

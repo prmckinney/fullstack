@@ -16,7 +16,7 @@ const createBlog = async (page, title, author, url) => {
 
 const likeBlog = async (page, title, author) => {
   // Expand Details
-  await page.getByRole('link', { name: `${title} ${author}` }).click()
+  await page.getByRole('link', { name: `${title} by ${author}` }).click()
 
   // Click Like
   await page.getByRole('button', { name: 'like' }).click()

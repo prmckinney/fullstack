@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Routes, Route, Link, useMatch, useNavigate
 } from 'react-router-dom'
+import { Alert, AppBar, Button, Container, Toolbar, Typography } from '@mui/material'
 
 import Notification from './components/Notification'
 import Error from './components/Error'
@@ -51,9 +52,9 @@ const App = () => {
       setPassword('')
     }
     catch {
-      setError('wrong credentials')
+      setNotification({ text: 'wrong credentials', type: 'error' })
       setTimeout(() => {
-        setError(null)
+        setNotification(null)
       }, 5000)
     }
     console.log('logging in with', username, password)
@@ -83,16 +84,16 @@ const App = () => {
     try {
       const returnedBlog = await blogService.createNew(newBlogObject)
       setBlogs(blogs.concat(returnedBlog))
-      setNotification(`New blog "${title}" by "${author}" added`)
+      setNotification({ text: `New blog "${title}" by "${author}" added`, type: 'success' })
       setTimeout(() => {
         setNotification(null)
       }, 5000)
 
     }
     catch {
-      setError(`Unable to add "${title}"`)
+      setNotification({ text: `Unable to add "${title}"`, type: 'error' })
       setTimeout(() => {
-        setError(null)
+        setNotification(null)
       }, 5000)
     }
   }
@@ -116,17 +117,33 @@ const App = () => {
     ? blogs.find(blog => blog.id === match.params.id)
     : null
 
+  const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
 
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">blogs</Link>
-        {(user) ? <Link style={padding} to="/create">new blog</Link> : null}
-        {(!user) ? <Link style={padding} to="/login">login</Link> : <button onClick={handleLogout}>Logout</button>}
-      </div>
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography sx={style} sx="flex:1">Blog App</Typography>
+          <Button color="inherit" component={Link} to="/" sx={style}>
+            blogs
+          </Button>
+          {(user) ?
+            <Button color="inherit" component={Link} to="/create" sx={style}>
+              new blog
+            </Button> : null
+          }
+          {(!user) ?
+            <Button color="inherit" component={Link} to="/login" sx={style}>
+              login
+            </Button> :
+            <Button color="inherit" onClick={handleLogout} sx={style}>
+              logout
+            </Button>}
+        </Toolbar>
+      </AppBar>
 
-      <Error message={error} />
-      <Notification message={notification} />
+      {/* <Error message={error} /> */}
+      <Notification notification={notification} />
 
       <Routes>
         <Route path="/" element={
@@ -135,7 +152,7 @@ const App = () => {
             <h2>Blogs</h2>
             {blogs.sort((a, b) => b.likes - a.likes).map((blog) => {
               const url = `blogs/${blog.id}`
-              return (<li key={blog.id}><a href={url}>{blog.title} {blog.author}</a></li>)
+              return (<li key={blog.id}><a href={url}>{blog.title} by {blog.author}</a></li>)
             })}
           </div>
         } />
@@ -149,7 +166,7 @@ const App = () => {
           <LoginForm username={username} setUsername={setUsername} password={password} setPassword={setPassword} handleLogin={handleLogin} />
         } />
       </Routes>
-    </div>
+    </Container >
   )
 }
 
