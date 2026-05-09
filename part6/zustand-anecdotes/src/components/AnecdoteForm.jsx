@@ -1,12 +1,17 @@
-import { useAnecdoteControl } from './Store'
+import { useAnecdoteControl, useNotificationControl } from './Store'
 
 const AnecdoteForm = () => {
   const { add } = useAnecdoteControl()
+  const { setNotification } = useNotificationControl()
 
-  const addAnecdote = (e) => {
+  const addAnecdote = async (e) => {
     e.preventDefault()
-    const content = e.target.anecdote.value
-    add(content)
+    add(e.target.anecdote.value)
+    setNotification(`You added ${e.target.anecdote.value}`)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+
     e.target.reset()
   }
 
@@ -15,7 +20,7 @@ const AnecdoteForm = () => {
       <h2>create new</h2>
       <form onSubmit={addAnecdote}>
         <div>
-          <input name="anecdote"/>
+          <input name="anecdote" />
         </div>
         <button type="submit">create</button>
       </form>

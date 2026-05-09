@@ -1,15 +1,38 @@
 import { create } from 'zustand'
-
-const generateId = () => Number((Math.random() * 1000000).toFixed(0))
+import anecdoteService from '../services/anecdotes'
 
 const useAnecdoteStore = create(set => ({
-  anecdotes: [{id:0, content:"Anecdote One", votes:0}, {id:1, content:"Anecdote Two", votes:2}],
+  anecdotes: [],
   filter: '',
   actions: {
-    setFilter: content => set(() => ({ filter: content})),
-    add: content => set(state => ({ anecdotes: [...state.anecdotes, {content: content, votes: 0, id: generateId()}] })),
-    vote: id => set(state => ({ anecdotes: state.anecdotes.map(ancedote => ancedote.id === id ? {...ancedote, votes: ancedote.votes+1}: ancedote) })),
-  }  
+    initialize: async () => {
+      const anecdotes = await anecdoteService.getAll()
+      set(() => ({ anecdotes }))
+    },
+    setFilter: content => set(() => ({ filter: content })),
+    add: async content => {
+      const newAnecdote = await anecdoteService.createNew(content)
+      set(state => ({ anecdotes: [...state.anecdotes, newAnecdote] }))
+    },
+    remove: async id => {
+      //const anecdote = useAnecdoteStore.getState().anecdotes.find(anecdote => anecdote.id === id)
+      anecdoteService.remove(id)
+      set(state => ({ anecdotes: state.anecdotes.filter(ancedote => ancedote.id !== id) }))
+    },
+    vote: async id => {
+      const anecdote = useAnecdoteStore.getState().anecdotes.find(anecdote => anecdote.id === id)
+      const updatedAncedote = { ...anecdote, votes: anecdote.votes + 1 }
+      anecdoteService.update(updatedAncedote)
+      set(state => ({ anecdotes: state.anecdotes.map(ancedote => ancedote.id === id ? updatedAncedote : ancedote) }))
+    },
+  }
+}))
+
+const useNotificationStore = create(set => ({
+  notification: null,
+  actions: {
+    setNotification: notification => set(() => ({ notification: notification }))
+  }
 }))
 
 // the hook functions that are used elsewhere in app
@@ -17,7 +40,9 @@ export const useAnecdotes = () => {
   const anecdotes = useAnecdoteStore((state) => state.anecdotes)
   const filter = useAnecdoteStore((state) => state.filter)
   return anecdotes.filter(anecdote => anecdote.content.includes(filter))
-  //return anecdotes
 }
 
 export const useAnecdoteControl = () => useAnecdoteStore(state => state.actions)
+
+export const useNotification = () => useNotificationStore(state => state.notification)
+export const useNotificationControl = () => useNotificationStore(state => state.actions)

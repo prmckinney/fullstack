@@ -1,12 +1,11 @@
-import { useAnecdotes, useAnecdoteControl } from './Store'
+import { useAnecdotes, useAnecdoteControl, useNotificationControl } from './Store'
 
 const AnecdoteList = () => {
   const anecdotes = useAnecdotes()
-  const { vote } = useAnecdoteControl()
+  const { vote, remove } = useAnecdoteControl()
+  const { setNotification } = useNotificationControl()
 
   const sortedAnecdotes = anecdotes.toSorted((a, b) => b.votes - a.votes);
-  console.log("anecdotes ==> ", anecdotes);
-  console.log("sortedAnecdotes ==> ", sortedAnecdotes);
 
   return (
     <div>
@@ -16,7 +15,24 @@ const AnecdoteList = () => {
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id)}>vote</button>
+            <button onClick={() => {
+              setNotification(`You voted for ${anecdote.content}`)
+              setTimeout(() => {
+                setNotification(null)
+              }, 5000)
+              vote(anecdote.id)
+            }}>vote</button>
+            {
+              (anecdote.votes === 0) ?
+                <button onClick={() => {
+                  setNotification(`Deleted ${anecdote.content}`)
+                  setTimeout(() => {
+                    setNotification(null)
+                  }, 5000)
+                  remove(anecdote.id)
+                }}>delete</button>
+                : null
+            }
           </div>
         </div>
       ))}
