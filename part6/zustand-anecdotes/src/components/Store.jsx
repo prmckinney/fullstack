@@ -37,12 +37,13 @@ const useNotificationStore = create(set => ({
 
 // the hook functions that are used elsewhere in app
 export const useAnecdotes = () => {
-  const anecdotes = useAnecdoteStore((state) => state.anecdotes)
+  const anecdotes = useAnecdoteStore((state) => state.anecdotes).toSorted((a, b) => b.votes - a.votes);
   const filter = useAnecdoteStore((state) => state.filter)
   return anecdotes.filter(anecdote => anecdote.content.includes(filter))
 }
-
 export const useAnecdoteControl = () => useAnecdoteStore(state => state.actions)
 
 export const useNotification = () => useNotificationStore(state => state.notification)
 export const useNotificationControl = () => useNotificationStore(state => state.actions)
+
+export default useAnecdoteStore
