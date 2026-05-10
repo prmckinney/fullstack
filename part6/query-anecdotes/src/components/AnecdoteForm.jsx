@@ -1,13 +1,18 @@
 import { useAnecdotes } from '../hooks/useAnecdotes'
+import useNotify from '../hooks/useNotify'
 
 const AnecdoteForm = () => {
   const { addAnecdote } = useAnecdotes()
+  const { notify } = useNotify()
 
   const onCreate = (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
-    addAnecdote(content)
     event.target.reset()
+    if (content.length >= 5)
+      addAnecdote(content)
+    else
+      notify(`too short... anecdote must be at least 5 characters long`)
   }
 
   return (
