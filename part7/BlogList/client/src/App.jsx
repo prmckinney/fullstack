@@ -14,24 +14,29 @@ import Notification from "./components/Notification";
 import {
   useBlogControl,
   useNotificationControl,
+  useLoginControl,
+  useLogin,
   useUserControl,
-  useUser,
 } from "./components/Store";
 import LoginForm from "./components/LoginForm";
 import CreateBlogForm from "./components/CreateBlogForm";
 import BlogList from "./components/BlogList";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
+import UserList from "./components/UserList";
+import User from "./components/User";
 
 const App = () => {
   const { setNotification } = useNotificationControl();
+  const { initializeLogin, logout } = useLoginControl();
   const { initializeBlog } = useBlogControl();
-  const { initializeUser, logout } = useUserControl();
-  const user = useUser();
+  const { initializeUsers } = useUserControl();
+  const login = useLogin();
 
   useEffect(() => {
-    initializeUser();
+    initializeLogin();
     initializeBlog();
+    initializeUsers();
   }, []);
 
   const navigate = useNavigate();
@@ -61,12 +66,15 @@ const App = () => {
           <Button color="inherit" component={Link} to="/" sx={style}>
             blogs
           </Button>
-          {user ? (
+          <Button color="inherit" component={Link} to="/users" sx={style}>
+            users
+          </Button>
+          {login ? (
             <Button color="inherit" component={Link} to="/create" sx={style}>
               new blog
             </Button>
           ) : null}
-          {!user ? (
+          {!login ? (
             <Button color="inherit" component={Link} to="/login" sx={style}>
               login
             </Button>
@@ -90,6 +98,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<BlogList />} />
           <Route path="/blogs/:id" element={<Blog />} />
+          <Route path="/users" element={<UserList />} />
+          <Route path="/users/:id" element={<User />} />
           <Route path="/create" element={<CreateBlogForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="*" element={<h1>404 - Page not found</h1>} />

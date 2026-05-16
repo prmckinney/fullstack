@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import loginService from "../services/login";
 import blogService from "../services/blogs";
+import userService from "../services/users";
+
+import { getUser, saveUser, removeUser } from "../services/persistentUser";
 
 const setNotification = ({ notification, type }) => {
   useNotificationStore.setState({ notification: notification, type: type });
@@ -9,7 +12,7 @@ const setNotification = ({ notification, type }) => {
   }, 5000);
 };
 
-const useUserStore = create((set) => ({
+const useLoginStore = create((set) => ({
   user: null,
   username: "",
   password: "",
@@ -17,8 +20,8 @@ const useUserStore = create((set) => ({
   actions: {
     setUsername: (username) => set(() => ({ username })),
     setPassword: (password) => set(() => ({ password })),
-    initializeUser: async () => {
-      const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    initializeLogin: async () => {
+      const loggedUserJSON = getUser();
       if (loggedUserJSON) {
         const user = JSON.parse(loggedUserJSON);
         console.log("user ==> ", user);
@@ -29,12 +32,12 @@ const useUserStore = create((set) => ({
     login: async () => {
       try {
         console.log("LOGIN");
-        const username = useUserStore.getState().username;
-        const password = useUserStore.getState().password;
+        const username = useLoginStore.getState().username;
+        const password = useLoginStore.getState().password;
 
         const user = await loginService.login({ username, password });
 
-        window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+        saveUser(user);
         blogService.setToken(user.token);
         console.log("user ==> ", user);
         console.log("logged in with", username, password);
@@ -49,7 +52,7 @@ const useUserStore = create((set) => ({
       }
     },
     logout: () => {
-      window.localStorage.setItem("loggedBlogappUser", "");
+      removeUser();
       blogService.setToken("");
 
       set(() => ({ user: null, username: "", password: "" }));
@@ -110,6 +113,17 @@ const useBlogStore = create((set) => ({
   },
 }));
 
+const useUserStore = create((set) => ({
+  users: [],
+  actions: {
+    initializeUsers: async () => {
+      const users = await userService.getAll();
+      console.log("users ==> ", users);
+      set(() => ({ users }));
+    },
+  },
+}));
+
 const useNotificationStore = create((set) => ({
   notification: null,
   type: null,
@@ -119,15 +133,19 @@ const useNotificationStore = create((set) => ({
   },
 }));
 
-// User Hooks
-export const useUser = () => useUserStore((state) => state.user);
-export const useUsername = () => useUserStore((state) => state.username);
-export const usePassword = () => useUserStore((state) => state.userpassword);
-export const useUserControl = () => useUserStore((state) => state.actions);
+// Login Hooks
+export const useLogin = () => useLoginStore((state) => state.user);
+export const useUsername = () => useLoginStore((state) => state.username);
+export const usePassword = () => useLoginStore((state) => state.userpassword);
+export const useLoginControl = () => useLoginStore((state) => state.actions);
 
 // Blog Hooks
 export const useBlogs = () => useBlogStore((state) => state.blogs);
 export const useBlogControl = () => useBlogStore((state) => state.actions);
+
+// User Hooks
+export const useUsers = () => useUserStore((state) => state.users);
+export const useUserControl = () => useUserStore((state) => state.actions);
 
 // Notification Hooks
 export const useNotification = () =>

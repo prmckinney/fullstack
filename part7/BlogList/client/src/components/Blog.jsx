@@ -2,13 +2,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Paper, Typography } from "@mui/material";
 
 import blogService from "../services/blogs";
-import { useUser, useBlogs, useBlogControl } from "./Store";
+import { useLogin, useBlogs, useBlogControl } from "./Store";
 
 const Blog = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const blogs = useBlogs();
-  const user = useUser();
+  const login = useLogin();
   const { addLike, removeBlog } = useBlogControl();
 
   if (!blogs) return null;
@@ -34,7 +34,7 @@ const Blog = () => {
       </Typography>
       <Typography variant="h6">
         {blog.likes} likes
-        {user ? (
+        {login ? (
           <Button
             onClick={() => {
               addLike(blog.id);
@@ -44,7 +44,7 @@ const Blog = () => {
             like
           </Button>
         ) : null}
-        {user && blog.user.id === user.id ? (
+        {login && blog.user.id === login.id ? (
           <Button
             onClick={async () => {
               if (window.confirm(`Remove ${blog.name} by ${blog.author}?`)) {

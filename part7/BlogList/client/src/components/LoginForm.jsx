@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useUsername, usePassword, useUserControl } from "../components/Store";
+import { useUsername, usePassword, useLoginControl } from "../components/Store";
 import { TextField, Button } from "@mui/material";
 
 const LoginForm = ({}) => {
   const navigate = useNavigate();
   const username = useUsername();
   const password = usePassword();
-  const { setUsername, setPassword, login } = useUserControl();
+  const { setUsername, setPassword, login } = useLoginControl();
 
   const handleLogin = async (event) => {
     event.preventDefault();

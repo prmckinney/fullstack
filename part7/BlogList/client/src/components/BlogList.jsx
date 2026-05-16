@@ -5,7 +5,6 @@ const BlogList = () => {
 
   return (
     <div>
-      {/* {userLogin} */}
       <h2>Blogs</h2>
       {blogs
         .sort((a, b) => b.likes - a.likes)
