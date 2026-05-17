@@ -22,8 +22,8 @@ const User = () => {
       <Typography variant="h4">{user.name}</Typography>
       <Typography variant="h6">Added Blogs</Typography>
       <ul>
-        {user.blogs.map((blog) => (
-          <li>{blog.title}</li>
+        {user.blogs.map((blog, index) => (
+          <li key={index}>{blog.title}</li>
         ))}
       </ul>
     </Paper>

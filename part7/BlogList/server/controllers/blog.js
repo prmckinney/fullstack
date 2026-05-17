@@ -1,60 +1,77 @@
-const blogRouter = require('express').Router()
-const middleware = require('../utils/middleware')
-const Blog = require('../models/blog')
-const User = require('../models/user')
+const blogRouter = require("express").Router();
+const middleware = require("../utils/middleware");
+const Blog = require("../models/blog");
+const User = require("../models/user");
 
-blogRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({}).populate('user', { blogs: 0 })
-  response.json(blogs)
-})
+blogRouter.get("/", async (request, response) => {
+  const blogs = await Blog.find({}).populate("user", { blogs: 0 });
+  response.json(blogs);
+});
 
-blogRouter.post('/', middleware.userExtractor, async (request, response) => {
-  const user = request.user
-
-  if (!user) {
-    return response.status(400).json({ error: 'UserId missing or not valid' })
-  }
-
-  const blog = new Blog({ ...request.body, user: user.id })
-  await blog.populate('user')
-  const savedBlog = await blog.save()
-  user.blogs = user.blogs.concat(savedBlog._id)
-  await user.save()
-
-  response.status(201).json(savedBlog)
-})
-
-blogRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
-  const user = request.user
+blogRouter.post("/", middleware.userExtractor, async (request, response) => {
+  const user = request.user;
 
   if (!user) {
-    return response.status(400).json({ error: 'UserId missing or not valid' })
+    return response.status(400).json({ error: "UserId missing or not valid" });
   }
 
-  const blog = await Blog.findById(request.params.id)
-  if (user.id.toString() !== blog.user.toString()) {
-    return response.status(400).json({ error: 'UserId not the same as BlogId' })
-  }
+  const blog = new Blog({ ...request.body, user: user.id });
+  await blog.populate("user");
+  const savedBlog = await blog.save();
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
 
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
-})
+  response.status(201).json(savedBlog);
+});
 
-blogRouter.put('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id)
-  await blog.populate('user')
+blogRouter.delete(
+  "/:id",
+  middleware.userExtractor,
+  async (request, response) => {
+    const user = request.user;
 
-  blog.likes = request.body.likes
+    if (!user) {
+      return response
+        .status(400)
+        .json({ error: "UserId missing or not valid" });
+    }
 
-  const updatedBlog = await blog.save()
-  response.status(201).json(updatedBlog)
-})
+    const blog = await Blog.findById(request.params.id);
+    if (user.id.toString() !== blog.user.toString()) {
+      return response
+        .status(400)
+        .json({ error: "UserId not the same as BlogId" });
+    }
 
-blogRouter.post('/reset', async (request, response) => {
-  await Blog.deleteMany({})
-  await User.deleteMany({})
+    await Blog.findByIdAndDelete(request.params.id);
+    response.status(204).end();
+  },
+);
 
-  response.status(204).end()
-})
+blogRouter.put("/:id", async (request, response) => {
+  const blog = await Blog.findById(request.params.id);
+  await blog.populate("user");
 
-module.exports = blogRouter
+  blog.likes = request.body.likes;
+
+  const updatedBlog = await blog.save();
+  response.status(201).json(updatedBlog);
+});
+
+blogRouter.post("/:id/comments", async (request, response) => {
+  const blog = await Blog.findById(request.params.id);
+
+  blog.comments = blog.comments.concat(request.body.comment);
+
+  const updatedBlog = await blog.save();
+  response.status(201).json(updatedBlog);
+});
+
+blogRouter.post("/reset", async (request, response) => {
+  await Blog.deleteMany({});
+  await User.deleteMany({});
+
+  response.status(204).end();
+});
+
+module.exports = blogRouter;

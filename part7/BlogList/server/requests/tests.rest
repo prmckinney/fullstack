@@ -33,3 +33,11 @@ Content-Type: application/json
   "username": "test",
   "password": "password"
 }
+
+###
+POST http://localhost:3000/api/blogs/6a091b4581406846c0fb88c3/comments
+Content-Type: application/json
+
+{
+  "comment": "I think this is a great blog"
+}

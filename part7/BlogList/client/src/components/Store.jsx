@@ -110,6 +110,29 @@ const useBlogStore = create((set) => ({
         blogs: state.blogs.map((blog) => (blog.id === id ? updatedBlog : blog)),
       }));
     },
+    addComment: async (id, comment) => {
+      // const tempBlog = useBlogStore
+      //   .getState()
+      //   .blogs.find((blog) => blog.id === id);
+      // const updatedBlog = {
+      //   ...tempBlog,
+      //   comments: tempBlog.comments.concat(comment),
+      // };
+      // console.log("updatedBlog ==> ", updatedBlog);
+
+      const updatedBlog = await blogService.addComment(id, {
+        comment: comment,
+      });
+
+      setNotification({
+        notification: `Added comment: ${comment}`,
+        type: "info",
+      });
+
+      set((state) => ({
+        blogs: state.blogs.map((blog) => (blog.id === id ? updatedBlog : blog)),
+      }));
+    },
   },
 }));
 
